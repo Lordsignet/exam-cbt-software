@@ -1,0 +1,618 @@
+<?php
+if ( !defined('ABSPATH') )
+define('ABSPATH', dirname(__FILE__) . '/');
+require_once(ABSPATH . 'student_session.php');
+require_once(ABSPATH . '../models/table_class.php');
+require_once(ABSPATH . '../models/admin-table.php');
+require_once(ABSPATH . '../database/base.php');
+$quizClass = new User_table($db);
+$quizArray = [];
+$questionArray = [];
+$questionShuffledArray = [];
+$optionsShuffledArray = [];
+$questionShuffledValue = [];
+$userPasswordArray = [];
+$userPasswordValue = [];
+$questionSql = [];
+$questionRows = [];
+$totalTime  = NULL;
+$quizid = NULL;
+$totalRows = NULL;
+$optionsArrays = NULL;
+$time = NULL;
+$timestampTime = NULL;
+$totalTimeS = NULL;
+$totalTime = NULL;
+$chosenAnswer = NULL;
+list($v,$x,$y,$z) = $quizClass->getContributorId();
+$studentid = $v;
+
+$questionShuffledArray = $quizClass->getShuffledQuestionData($studentid);
+
+
+if($questionShuffledArray->rowCount() === 0) {
+$quizArray = $quizClass->getQuizDataStudent($y,$x,$z);
+if($quizArray->rowCount() === 0) {
+	$quizvalue = NULL;
+}
+$quizvalue = $quizArray->fetchAll(PDO::FETCH_ASSOC);
+if(!$quizvalue) {
+	/*echo "<p>Something went wrong, please try again later</p>"; */
+	exit("<p>Something went wrong, please try again later</p>");
+}
+$quizid = $quizvalue[0]["quiz_id"];
+$totalQuest = 12;//$quizvalue[0]["quiz_total"];
+$time = $quizvalue[0]["quiz_time"];
+$position = 0;
+//$totalQuest = $totalQuest;
+$questionSql = $db->prepare("SELECT * FROM question WHERE quiz_id = :quizID ORDER BY RAND() LIMIT :position1, :position2;");
+$questionSql->bindParam(':quizID', $quizid);
+$questionSql->bindParam(':position1', $position, PDO::PARAM_INT);
+    $questionSql->bindParam(':position2', $totalQuest, PDO::PARAM_INT);
+
+    $questionSql->execute();
+//$questionArray = $quizClass->getQuestionData($quizid,$totalQuest);
+if($questionSql->rowCount() === 0) {
+	$questionRows = NULL;
+}
+$totalRows = $questionSql->rowCount();
+$questionRows = $questionSql->fetchAll(PDO::FETCH_ASSOC);
+
+$questionid = $questionRows[0]["question_id"];
+$optionsArray = $quizClass->getOptions($questionid);
+if($optionsArray->rowCount() === 0) {
+	$optionRow = NULL;
+}
+
+
+foreach($questionRows as $key => $shuffledques) {
+	$timeToinsert =  number_format(microtime(TRUE)*1000,0,'.','' );
+	try {
+		$data = $quizClass->insertShuffledQues($studentid,$shuffledques["question_id"],$shuffledques["question_cont"],$shuffledques["question_url"],$timeToinsert,$quizid);
+		if($data->rowCount() === 0) {
+					$lastInsertId = NULL;
+				}
+				$optionsArrays = $quizClass->getOptions($shuffledques["question_id"]);
+				//$lastInsertId = $db->lastInsertId();
+			foreach($optionsArrays as $optkey => $optionRow) {
+				$quizClass->insertShuffledAns($studentid,$shuffledques["question_id"],$optionRow["options_id"],$optionRow["options_text"],$optionRow["opt_alphbet"]);
+				
+			} 
+		
+			
+			
+		
+} catch(Exception $e) {
+	
+	
+}
+	}
+	$questionShuffledArray = $quizClass->getShuffledQuestionData($studentid);
+	$questionShuffledValue = $questionShuffledArray->fetchAll(PDO::FETCH_ASSOC);
+
+$questionID = $questionShuffledValue[0]["question_id"];	
+$timestampTime = $questionShuffledValue[0]["timestamp"];
+$chosenAnswer = $questionShuffledValue[0]["chosen_ans"];
+$optionsShuffledArray = $quizClass->getShuffledOptData($studentid,$questionID);
+$quizArray = $quizClass->getQuizDataStudent($y,$x,$z);
+if($quizArray->rowCount() === 0) {
+	$quizvalue = NULL;
+}
+$quizvalue = $quizArray->fetchAll(PDO::FETCH_ASSOC);
+$time = $quizvalue[0]["quiz_time"];
+$userPasswordArray = $quizClass->getExtraTimeData($studentid);
+if($userPasswordArray->rowCount() === 0) {
+$userPasswordValue = NULL;	
+}
+$userPasswordValue = $userPasswordArray->fetchAll(PDO::FETCH_ASSOC);
+$userExtraTime = ($userPasswordValue[0]["user_extra_time"] && is_numeric($userPasswordValue[0]["user_extra_time"])) ? $userPasswordValue[0]["user_extra_time"] : 0;
+$timeSplit = explode(":", $time);
+$totalTime = (int)$userExtraTime + (int)$timeSplit[1];
+$totalTimeS = $timeSplit[0] . ":" . $totalTime;	
+} else if($questionShuffledArray->rowCount() > 0)  {
+	$totalRows = $questionShuffledArray->rowCount();
+$questionShuffledValue = $questionShuffledArray->fetchAll(PDO::FETCH_ASSOC);
+if($questionShuffledValue[0]["status"] === 'ongoing') {
+$timestampTime = $questionShuffledValue[0]["timestamp"];
+$questionID = $questionShuffledValue[0]["question_id"];	
+$chosenAnswer = $questionShuffledValue[0]["chosen_ans"];
+$optionsShuffledArray = $quizClass->getShuffledOptData($studentid,$questionID);
+$optionsShuffledArray = $optionsShuffledArray->fetchAll(PDO::FETCH_ASSOC);
+$quizArray = $quizClass->getQuizDataStudent($y,$x,$z);
+if($quizArray->rowCount() === 0) {
+	$quizvalue = NULL;
+}
+$quizvalue = $quizArray->fetchAll(PDO::FETCH_ASSOC);
+$time = $quizvalue[0]["quiz_time"];
+$userPasswordArray = $quizClass->getExtraTimeData($studentid);
+if($userPasswordArray->rowCount() === 0) {
+$userPasswordValue = NULL;	
+}
+$userPasswordValue = $userPasswordArray->fetchAll(PDO::FETCH_ASSOC);
+$userExtraTime = ($userPasswordValue[0]["user_extra_time"] && is_numeric($userPasswordValue[0]["user_extra_time"])) ? $userPasswordValue[0]["user_extra_time"] : 0;
+$timeSplit = explode(":", $time);
+
+$totalTime = (int)$userExtraTime + (int)$timeSplit[1];
+$totalTimeS = $timeSplit[0] . ":" . $totalTime;	
+} else {
+header('location:../index.php');	
+	
+}
+} else {
+	
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>iCBT</title>
+  <link rel="stylesheet" href="./style.css" />
+
+</head>
+<body>
+
+<div class="quiz_box">
+
+ <header>
+            <div class="title">iCBT&nbsp;&nbsp;&nbsp;<span class="userData"><span>Reg No: &nbsp;<?=$_SESSION["regno"]; ?></span><span>&nbsp;&nbsp;Session: &nbsp;<?=$_SESSION["year"]; ?></span><span>&nbsp;&nbsp;Semester: &nbsp;<?=$_SESSION["semester"]; ?></span><span>&nbsp;&nbsp;&nbsp;Level:&nbsp;<?=$_SESSION["class"]; ?></span></span></div>
+			<input type="hidden" id="student" class="student" value="<?=$_SESSION["student"]; ?>">
+			<input type="hidden" id="semester" class="semester" value="<?=$_SESSION["semester"]; ?>">
+			
+			<!--<span class="exit" id="exit"><a href="#">Quit</a></span> --->
+			<span class="logouts"><a href="logout.php">Log out</a></span>
+            <div class="timer">
+			 
+                <div class="time_left_txt">Time Left</div>
+                <div class="timer_sec">15</div>
+            </div>
+            <div class="time_line"></div>
+        </header>
+<div class="quiz-container ">
+  <div id="quiz">
+  <div class="slide">
+  <?php
+$path = "../uploads/"; 
+$question_url = NULL; 
+	  $question_url = $questionShuffledValue[0]["question_urls"];
+     	  
+  ?>
+  <div class="question">
+  <?php  echo $questionShuffledValue[0]["question_content"] . "<br />"; ?>
+  <?php if(isset( $question_url)) { ?>
+  <?php echo $question_url; ?>
+  
+  
+	 
+	  
+  <?php } else { } ?>
+ 
+  
+   
+ 
+  </div>
+  <?php 
+  $chosenAnswer =  $questionShuffledValue[0]["chosen_ans"];
+  $html = "";
+ /* foreach($optionsShuffledArray as $key => $optionRow){
+ $html .= '<label><input type="radio" name="question0" value="' . $optionRow["option_texts"] . '">' . chr(65 + $key)  . ':'  . ' ' .  $optionRow["option_texts"] . '</label>';
+  } 
+  */?>
+  <div class="answers">
+  
+  
+<?php 
+foreach($optionsShuffledArray as $key => $optionRow):?>
+<label><input type="radio" name="question0" id="answerUsed" value="<?=$optionRow['option_texts']; ?>" <?php echo (isset($chosenAnswer) && $chosenAnswer == $optionRow['option_texts']) ? "checked"  : "";?>> <?= chr(65 + $key); ?> <?= ':' . ' ' . $optionRow["option_texts"]; ?>
+ </label> <?php endforeach; ?>
+ 
+</div>
+  </div></div>
+</div>
+<footer class="showed">
+<button class="prev_btn" id="previous">Prev Que</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<button class="next_btn" id="next">Next Que</button>
+<button class="submit_btn" id="submit">Submit Quiz</button>
+<span><ul id="pagein">
+<?php 
+ 
+ $i = 1; foreach($questionShuffledValue  as $key => $questionRowd): ?>
+<li><a onclick="get_data(this);" id="<?=$questionRowd["question_id"]; ?>" href="#"> <?=$i; ?> </a></li>
+ 
+ 
+<?php $i++; endforeach; ?>
+
+</ul></span>
+<div id="overlay"  style="display:none">
+<img src="../images/LoaderIcon.gif"/>
+</div>
+  <br>
+  <span><a class="circleiT" id="saveIt" href="#">Save</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="returnedvALUE"></span></span>
+
+
+ </footer>
+ </div>
+ <div class="result_box">
+        <div class="icon">
+            <i class="fas fa-crown"></i>
+        </div> 
+<div id="results"></div>
+</div>
+
+<!-- partial -->
+<script  src="./jquery.min.js"></script>
+ <!-- <script  src="./script.js"></script> -->
+<script type="text/javascript">
+function showResults() {
+	
+let quiz_box = document.querySelector(".quiz_box");
+
+let result_box = document.querySelector(".result_box");
+jQuery.ajax({
+		type: 'POST',
+		url: 'submit_data.php',
+		data: {'studentid' : jQuery("#student").val(),
+		},
+		beforeSend: function() {
+         jQuery("#overlay").show();
+		},
+success: function(data) {
+	//alert(data);
+if(data.indexOf("successfully") !== -1) {
+jQuery("#results").html(data);
+quiz_box.classList.remove("activeQuiz");
+result_box.classList.add("activeResult");
+jQuery("#overlay").hide();
+setTimeout(function() {
+window.location = "../index.php";
+}, 10000)	
+} else {
+	
+	alert(data);
+	jQuery("#overlay").hide();
+	
+}
+}	
+});
+}	
+
+function get_data(no) {
+	var answersOptions,answerTodisplay;
+jQuery.ajax({
+type: 'POST',
+url: 'get_data.php',
+data: {'row_no': jQuery(no).attr("id"),
+       'studentid': jQuery("#student").val(),
+},
+beforeSend: function() {
+	
+	jQuery("#overlay").show();
+	
+},
+success: function(data) {
+	//console.log(data);
+	if(data.success == true) {
+		
+if(data.result.length > 0) {
+	var datas = "";
+	var chosen_ans = data.result[0].chosen_ans;
+	var questionId = data.result[0].questionid;
+	var question_content = data.result[0].question_content;
+	var question_urls = (data.result[0].question_urls && data.result[0].question_urls.length > 4) ? data.result[0].question_urls : ""; 
+	
+		
+		
+	jQuery("#overlay").hide();
+	jQuery(".question").empty().html(question_content + "<br />" + question_urls);
+	
+	for(var i = 1; i < data.result.length; i++) {
+		//if(i == 0) continue;
+		////console.log(data.result[i].option_texts);
+//$("#dashboard-widgets dt>input[type='checkbox'][value="+el+"]").prop('checked', true);
+capturedData = data.result[i].option_texts;
+
+
+      
+	datas += '<label><input type="radio" name="question0" value="' + data.result[i].option_texts + '">' + data.result[i].option_alpha  + ':'  + ' ' +   data.result[i].option_texts  + '</label>';
+	
+	//var question_urls = data.result[0]["question_urls"];
+	}
+
+jQuery(".answers").empty(); 
+document.querySelector(".answers").innerHTML = datas; 
+
+
+	$(".slide").show();
+	answersOptions = jQuery('input[type="radio"]').map(function(){
+return this.value; }).get();
+	jQuery.each(answersOptions, function(i, els) {
+		if(els === chosen_ans) {
+answerTodisplay = document.querySelectorAll(".answers label input")[i];
+answerTodisplay.checked = true;
+		}
+});
+
+	
+	} else {
+	var error = data.error;
+alert(error);
+jQuery("#overlay").hide();	
+		
+	}
+	
+	}
+}
+});	
+}	
+	
+
+var pageSize = 1;
+var currentPage = 1;
+var maxPage = 10;
+var incremSlide = 10;
+var startPage = 0;
+var numberPage = 0;
+var totalRows = <?=$totalRows; ?>;
+var lastindex = 0;
+var finalIndex = 0;
+function dataTouse(){
+  // Functions
+  function buildQuiz(){
+    // variable to store the HTML output
+    const output = [];
+const start_btn = document.querySelector(".start_btn button");
+const info_box = document.querySelector(".info_box");
+const quiz_box = document.querySelector(".quiz_box");
+const footer = document.querySelector(".showed");
+const result_box = document.querySelector(".result_box");
+const time = "<?=$totalTimeS; ?>";
+let timePart;
+let hoursMinutes;
+
+	quiz_box.classList.add("activeQuiz"); //show quiz box
+	footer.style.display = "block";
+    timePart = time.split(":");
+   hoursMinutes = (+timePart[0] * (60 * 60)) + (+timePart[1] * 60);
+  startTimer(hoursMinutes);
+  
+  
+   
+
+  }
+  
+
+ 
+       
+	function startTimer(duration) {
+		const timeCount = document.querySelector(".timer .timer_sec");
+const quiz_box = document.querySelector(".quiz_box");
+//const footer = document.querySelector(".showed");
+const result_box = document.querySelector(".result_box");
+
+	   timer();
+	    counter = setInterval(timer, 1000);
+	   var start = <?=$timestampTime; ?>,
+	   diff,
+	   hour,
+	   minutes,
+	   counter,
+	   seconds;
+	   function timer() {
+		   diff = Math.round(duration - (((Date.now() - (start + 100)) / 1000) | 0));
+		   
+		    hour =   diff / (60 * 60 ) | 0 ;
+            minutes = (diff % ( 60 * 60)) / 60 | 0;
+			
+		   seconds = (diff % 60) | 0;
+		   
+		   hour = hour < 10 ? "0" + hour : hour;
+		   minutes = minutes < 10 ? "0" + minutes : minutes;
+		   seconds = seconds < 10 ? "0" + seconds : seconds;
+ 
+		   
+		   timeCount.textContent = hour == "00" ? minutes + ':' + seconds : hour + ':' + minutes + ':' + seconds;
+		   	if(duration < 0) {
+			clearInterval(counter);
+		   }			
+		   if(diff <= 0) {
+			   //start = Date.now() + 1000;
+			   clearInterval(counter);
+			   quiz_box.classList.remove("activeQuiz");
+			  showResults(); 
+	result_box.classList.add("activeResult");
+	  setTimeout(function(){
+              
+	          window.location = '../index.php';
+            },10000)
+	
+		   }
+	   };
+	  
+}
+const quizContainer = document.getElementById('quiz');
+  const resultsContainer = document.getElementById('results');
+  const submitButton = document.getElementById('submit');
+ 
+  buildQuiz();
+
+
+  }
+  
+
+  
+
+  // Variables
+  
+
+  
+
+
+
+  
+jQuery(function(){
+ dataTouse();
+ jQuery(".submit_btn").click(function() {
+	 showResults();
+	 
+ });
+jQuery("#saveIt").click(function(event) {
+	event.preventDefault();
+	var answerSelected = (jQuery(".answers").find(':checked') && jQuery(".answers").find(':checked').val()) ?  jQuery(".answers").find(':checked').val() : "" ;
+	var currentQuestion = jQuery("#pagein").find('.current').attr('id');
+  // alert(currentQuestion);
+	
+jQuery.ajax({
+	url: 'answer_data.php',
+	type: 'POST',
+	data: {
+	'answerSelected': answerSelected,
+     'currentQuestion': currentQuestion,
+	 'studentid': $("#student").val(),
+	},
+ beforeSend: function() {
+	 jQuery("#overlay").show();
+	
+ },
+success: function(data) {
+	//alert(data);
+	////console.log(data);
+	
+	if(data.success == true) {
+		//console.log(data);
+		jQuery("#overlay").hide();
+var result = data.result;
+//alert(result);
+$("#returnedvALUE").html('<strong style="color:green">' + result + '</span>').fadeIn().fadeOut(3000);
+	} else {
+	var error = data.error;
+	jQuery("#overlay").hide();
+	alert(error);
+	//console.log(error);
+		
+	} 
+
+
+}	
+});
+});
+
+ var slideLength = totalRows;
+var pageCount = Math.ceil( slideLength / pageSize);
+//console.log(pageCount);
+
+var totalSlidePage = Math.floor(pageCount / incremSlide);
+for(var i = startPage; i < pageCount; i++) {
+
+if(i > (maxPage -1)) {
+jQuery("#pagein li").eq(i).hide();
+var first = jQuery("#pagein li").eq(i).hide();
+var nameIt = jQuery("#pagein li").index(first);
+lastindex = maxPage;
+//console.log("the first hidden index is:", lastindex);
+
+} else {
+	jQuery("#pagein li").eq(i).show();
+	lastindex = 0;
+}
+//lastindex = maxPage;
+}
+
+var datas = document.querySelectorAll("#pagein li")[slideLength - 1];
+
+//console.log("pagein element was selected", datas);
+var prev = jQuery(".prev_btn").click(function() {
+  startPage -=10;
+  incremSlide -=10 //incremSlide = (incremSlide -3) +1;
+  numberPage--;
+  slide();
+  //console.log("prevstartPage:", startPage);
+  //console.log("previncremSlide:", incremSlide);
+   //console.log("prevnumberPage:",  numberPage);
+  
+  });
+  prev.hide();
+  var submit = jQuery(".submit_btn").click(function() {
+  //console.log("you clicked me");
+  
+  });
+  submit.hide();
+  
+  var next = jQuery(".next_btn").click(function() {
+  startPage += 10;
+  incremSlide += 10;
+  numberPage++;
+  slide();
+  //console.log("startPage:", startPage);
+  //console.log("incremSlide:", incremSlide);
+   //console.log(" numberPage:",  numberPage);
+  });
+  if(pageCount == maxPage || pageCount < maxPage ) {
+	  next.hide();
+	  submit.show();
+  } else {
+	  
+	  next.show();
+  }
+  //$("#pagein").prepend(prev).append(next);
+  jQuery("#pagein li").first().find("a").addClass("current");
+  
+var slide = function() {
+ jQuery("#pagein li").hide(); 
+   if (lastindex == startPage) {
+		  startPage -= 1;
+		  if( startPage == -1) { startPage = 0}
+	  } else {
+		 startPage +=0;
+	  }
+  
+  for(t = startPage; t < incremSlide; t++) {
+	 
+  jQuery("#pagein li").eq(t + 1).show();
+  }
+  
+  if(startPage == 0) {
+  next.show();
+  prev.hide();
+   submit.hide();
+  } else if(startPage == -1) {
+  next.show();
+  prev.hide();
+  submit.hide();
+  } else if( datas.style.display !== "none") {
+	  next.hide();
+	  prev.show();
+	  submit.show();
+
+  
+  } else {
+  next.show();
+  prev.show();
+  submit.hide();
+  }
+  }
+  
+var showPage = function(page) {
+jQuery(".slide").hide();
+jQuery(".slide").each(function(n) {
+if(n >= pageSize *(page - 1) && n < pageSize * page)
+jQuery(this).show();
+});
+}
+
+showPage(1);
+jQuery("#pagein li a").eq(0).addClass("current");
+jQuery("#pagein li a").click(function() {
+jQuery("#pagein li a").removeClass("current");
+jQuery(this).addClass("current");
+showPage(parseInt($(this).text()));
+//console.log($(this).text());
+});
+});
+ 
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+function myFunction() {
+  var x = document.getElementById("myLinks");
+  if (x.style.display === "block") {
+    x.style.display = "none";
+  } else {
+    x.style.display = "block";
+  }
+}
+
+function sendMail(){
+    $(".error").html("").hide();
+    var name = $('#name').val();
+    var email = $('#email').val();
+    var comment = $('#message').val();
+    if(name.length !== 0 && email.length !== 0 && comment.length !== 0)
+    {
+        
+        var input = {
+            "name" : name,
+            "email" : email,
+            "comment" : comment,
+            "action" : "send_mail"
+        };
+        $.ajax({
+            url : '/controller.php',
+            type : 'POST',
+            dataType : "json",
+            data : input,
+            success : function(response)
+            {
+                $('.success').html(response.message).show();
+            },
+            error : function(response)
+            {
+                 $('.error').html("Error").show();
+            }
+        });
+    }
+    else
+    {
+            $('.error').html("one or more than one field empty.").show();
+    }
+}
+
+function subscribeMail(){
+    $(".error1").html("").hide();
+    var names = $('#names').val();
+    var emails = $('#emails').val();
+    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    
+    if(names.length !== 0 && re.test(email)){
+        
+        var input = {
+            
+            "name" : names,
+            "email" : emails,
+            "action" : "checkmail"
+        };
+        $.ajax({
+            url : '/controller.php',
+            type : 'POST',
+            dataType : 'json',
+            data : input,
+            success : function(response){
+                $('.success1').html(response.message).show();
+                
+            },
+            complete: function(){
+             
+                 off();
+            },
+            error: function(response){
+                $('.error1').html("Error").show();
+            }
+        });
+    }
+    else{
+            $('.error1').html("One or more than one field empty./ Check Email.").show();
+    }
+} 
+
+function subscribeMail2(){
+    $(".error2").html("").hide();
+    var names = $('#names2').val();
+    var emails = $('#emails2').val();
+    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(names.length !== 0 && 1){
+        
+        var input = {
+            
+            "name" : names,
+            "email" : emails,
+            "action" : "checkmail"
+        };
+        $.ajax({
+            url : '/controller.php',
+            type : 'POST',
+            dataType : 'json',
+            data : input,
+            success : function(response){
+                $('.success2').html(response.message).show();
+                
+            },
+            complete: function(){
+             
+                 offh();
+            },
+            error: function(response){
+                $('.error2').html("Error").show();
+            }
+        });
+    }
+    else{
+            $('.error2').html("One or more than one field empty./ Check Email.").show();
+    }
+} 
+
+
+
+function offh(){
+    document.getElementById("hidden").style.display = "none";
+}

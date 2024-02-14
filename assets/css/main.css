@@ -1,0 +1,197 @@
+/*shift card body button to the bottom of the card*/
+.card-body {
+	display: flex;
+	flex-direction: column;
+}
+
+.card-body div.row {
+	margin-top: auto;
+}
+
+/* .btn-round{
+	border-radius: 30px;
+} */
+
+select{
+	text-align-last: center;
+}
+
+ul.dropdown-content {
+	display: none;
+	position: absolute;
+	left: 130px;
+	width: auto;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+	list-style-type: none;
+	transition: all 300ms ease 0s;
+	background-image: linear-gradient(to right, rgb(12, 38, 70) 0%, rgb(32, 64, 101) 60%, rgb(42, 87, 136) 100%);
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-repeat-x: initial;
+    background-repeat-y: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+    background-color: initial;
+	overflow-x: visible;
+	word-wrap: break-word;
+}
+ul.dropdown-content li{
+	
+	width: 160px;
+	
+	
+}
+
+
+.carddeleteicon {
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 10px;
+	opacity: 0;
+	-webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    -ms-transition: all .5s ease;
+    -o-transition: all .5s ease;
+    transition: all .5s ease;
+}
+
+.showpwd {
+      position: absolute;
+      top:57%;
+      left: 90%;
+}
+
+.center-element{
+	text-align: center;
+}
+
+.center-element > div{
+	margin: auto;
+}
+
+.logo-preview{
+	width: 200px;
+	height: 200px;
+}
+
+.logo a {
+	white-space: normal !important;	
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+ul.dropdown-menu li:hover {
+	background-color: #EEEEEE;
+}
+ul.dropdown-menu li a 
+{
+	text-decoration: none;
+}
+
+select {
+	padding: 7px;
+	padding-left: 4px !important;
+	padding-right: 4px !important;
+}
+.close_icon {
+	padding:0px;
+}
+i {
+	cursor: pointer;
+}
+.nav p {
+	color:white;
+}
+li.active p {
+	color: #f96332;
+}
+li.active {
+	border-radius: 5px;
+	border-color: yellow;
+}
+.sidebar .nav li>a{
+	font-size: 0.82em;
+}
+img.img-circle {
+border-radius: 50%;
+}
+/*overriding now-ui dashboard's card with bootstrap's card*/
+.card {
+	display: flex !important;
+	width:auto !important;
+	box-shadow: none !important;
+	border:1px solid rgba(0,0,0,.125) !important;
+	width: 100%;
+	
+	
+}
+.add_student {
+	display: flex !important;
+    width: 50%;
+	justify-content: right;
+	
+	left: calc(100% - 75%);	
+}
+
+
+/* delete icon must be displayed when hovered on the card*/
+.item.card:hover > .carddeleteicon {
+	opacity: 1;
+	-webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    -ms-transition: all .5s ease;
+    -o-transition: all .5s ease;
+    transition: all .5s ease;
+}
+
+.slick-slide:hover > .carddeleteicon{
+	opacity: 1;
+	-webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    -ms-transition: all .5s ease;
+    -o-transition: all .5s ease;
+    transition: all .5s ease;
+}
+
+
+/* CONTACT EMAILS */
+	.dataTables_wrapper.form-inline{
+		display: block;
+	}
+	.dataTables_paginate{
+		float: right;
+	}
+	.dataTables_length select {
+		margin-left: 5px !important;
+		margin-right: 5px !important;
+	}
+	.adminhead {
+    font-family: Poppins-Bold;
+    font-size: 40px;
+	font-stretch: extra-expanded;
+    color: white;
+    line-height: 1.2;
+    text-align: center;
+    width: 100%;
+    display: block;
+	padding-bottom: 10px;
+	margin-top: -50px;
+	}
+	
+	.sidebar .nav ul.dropdown-content li>a {
+	font-size: 0.75em;
+    line-height: 10px;
+    padding-left: 0px;	
+	}
+	
