@@ -60,6 +60,6 @@ Welcome to iCBT—an innovative Computer-Based Testing solution designed to stre
 
 - 🌟 **[Visit Our Website](https://icbt.lordsignet.org)**
 - 📧 **[Email Us](mailto:rocklinganayo@lordsignet.org)**
-- 🐦 **[Follow Us on Linkdln](https://www.linkedin.com/in/anayo-rockling-5b9653185?trk=contact-info)**
+-  **[Follow Us on Linkdln](https://www.linkedin.com/in/anayo-rockling-5b9653185?trk=contact-info)**
 
 Remember, iCBT isn't just software; it's a gateway to fair, efficient, and secure assessments. Let's redefine testing together! 🌟
